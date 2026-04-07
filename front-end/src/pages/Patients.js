@@ -7,6 +7,7 @@ function Patients() {
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState('');
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     first_name: '', last_name: '', dob: '',
     phone: '', email: '', address: '',
@@ -30,25 +31,33 @@ function Patients() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await apiService.createPatient(formData);
-      await loadPatients();
-      setShowForm(false);
-      setFormData({
-        first_name: '', last_name: '', dob: '',
-        phone: '', email: '', address: '',
-        emergency_contact: '', medical_history: ''
-      });
-      alert('Patient added successfully!');
-    } catch (error) {
-      alert('Error adding patient');
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
 
+  // Validate first
+  const validationErrors = validatePatient();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  setErrors({});
+  setLoading(true);
+  try {
+    await apiService.createPatient(formData);
+    await loadPatients();
+    setShowForm(false);
+    setFormData({
+      first_name: '', last_name: '', dob: '',
+      phone: '', email: '', address: '',
+      emergency_contact: '', medical_history: ''
+    });
+    alert('Patient added successfully!');
+  } catch (error) {
+    alert('Error adding patient');
+  } finally {
+    setLoading(false);
+  }
+};
   const handleDelete = async (id) => {
     if(window.confirm('Are you sure you want to delete this patient?')) {
       try {
@@ -62,6 +71,27 @@ function Patients() {
       }
     }
   };
+  const validatePatient = () => {
+  const newErrors = {};
+
+  if (!formData.first_name.trim())
+    newErrors.first_name = 'First name is required';
+
+  if (!formData.last_name.trim())
+    newErrors.last_name = 'Last name is required';
+
+  if (!formData.phone.trim()) {
+    newErrors.phone = 'Phone is required';
+  } else if (!/^\d{10}$/.test(formData.phone)) {
+    newErrors.phone = 'Phone must be exactly 10 digits';
+  }
+
+  if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    newErrors.email = 'Enter a valid email address';
+  }
+
+  return newErrors;
+};
 
   const filteredPatients = patients.filter(p =>
     `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
@@ -90,15 +120,33 @@ function Patients() {
               <div style={styles.formGrid}>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>First Name *</label>
-                  <input style={styles.input} value={formData.first_name}
-                    onChange={e => setFormData({...formData, first_name: e.target.value})}
-                    placeholder="First name" required />
+                  <input
+                    style={{
+                      ...styles.input,
+                      border: errors.first_name ? '1px solid #cc0000' : '1px solid #ddd'
+                    }}
+                    value={formData.first_name}
+                    onChange={e => {
+                      setFormData({...formData, first_name: e.target.value});
+                      if (errors.first_name) setErrors({...errors, first_name: ''});
+                    }}
+                    placeholder="First name" />
+                  {errors.first_name && <span style={styles.fieldError}>{errors.first_name}</span>}
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>Last Name *</label>
-                  <input style={styles.input} value={formData.last_name}
-                    onChange={e => setFormData({...formData, last_name: e.target.value})}
-                    placeholder="Last name" required />
+                  <input
+                    style={{
+                      ...styles.input,
+                      border: errors.last_name ? '1px solid #cc0000' : '1px solid #ddd'
+                    }}
+                    value={formData.last_name}
+                    onChange={e => {
+                      setFormData({...formData, last_name: e.target.value});
+                      if (errors.last_name) setErrors({...errors, last_name: ''});
+                    }}
+                    placeholder="Last name" />
+                  {errors.last_name && <span style={styles.fieldError}>{errors.last_name}</span>}
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>Date of Birth</label>
@@ -106,16 +154,35 @@ function Patients() {
                     onChange={e => setFormData({...formData, dob: e.target.value})} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>Phone *</label>
-                  <input style={styles.input} value={formData.phone}
-                    onChange={e => setFormData({...formData, phone: e.target.value})}
-                    placeholder="Phone number" required />
-                </div>
+                <label style={styles.label}>Phone *</label>
+                <input
+                  style={{
+                    ...styles.input,
+                    border: errors.phone ? '1px solid #cc0000' : '1px solid #ddd'
+                  }}
+                  value={formData.phone}
+                  onChange={e => {
+                    setFormData({...formData, phone: e.target.value});
+                    if (errors.phone) setErrors({...errors, phone: ''});
+                  }}
+                  placeholder="Phone number" />
+                {errors.phone && <span style={styles.fieldError}>{errors.phone}</span>}
+              </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>Email</label>
-                  <input style={styles.input} type="email" value={formData.email}
-                    onChange={e => setFormData({...formData, email: e.target.value})}
+                  <input
+                    style={{
+                      ...styles.input,
+                      border: errors.email ? '1px solid #cc0000' : '1px solid #ddd'
+                    }}
+                    type="email"
+                    value={formData.email}
+                    onChange={e => {
+                      setFormData({...formData, email: e.target.value});
+                      if (errors.email) setErrors({...errors, email: ''});
+                    }}
                     placeholder="Email address" />
+                  {errors.email && <span style={styles.fieldError}>{errors.email}</span>}
                 </div>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>Emergency Contact</label>
