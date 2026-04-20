@@ -128,7 +128,7 @@ npm start
 ## 🙋‍♀️ Author
 
 **Jeya Priya**
-- LinkedIn: [Your LinkedIn URL]
+- LinkedIn: [Jeya Priya](https://www.linkedin.com/in/jeyapriyacp14/)
 - GitHub: [@Priyapaulraj0014](https://github.com/Priyapaulraj0014)
 
 ---
