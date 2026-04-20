@@ -121,7 +121,23 @@ npm start
 
 ## 📸 Screenshots
 
-> Dashboard, Login, Patients, Appointments, Orders, Invoices
+### 🔐 Login Page
+![Login](screenshots/Login.png)
+
+### 🏠 Dashboard
+![Dashboard](screenshots/Dashboard.png)
+
+### 🧑‍⚕️ Patients
+![Patients](screenshots/patients.png)
+
+### 📅 Appointments
+![Appointments](screenshots/appointments.png)
+
+### 📦 Purchase Orders
+![Orders](screenshots/orders.png)
+
+### 🧾 Invoices
+![Invoices](screenshots/invoices.png)
 
 ---
 
